@@ -1,0 +1,45 @@
+# vader-sentiment LoadBalancer Service
+# Enables the pods in a deployment to be accessible from outside the cluster
+apiVersion: v1
+kind: Service
+metadata:
+  name: vader-sentiment-svc
+spec:
+  selector:
+    app: vader-sentiment
+  ports:
+    - protocol: "TCP"
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer
+
+---
+# vader-sentiment Deployment
+# Defines the deployment of the app running in a pod on any worker node
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vader-sentiment
+  labels:
+    app: vader-sentiment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vader-sentiment
+  template:
+    metadata:
+      labels:
+        app: vader-sentiment
+    spec:
+      containers:
+        - name: vader-sentiment
+          image: vader-sentiment:latest
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: IfNotPresent
+          #resources:
+            # You must specify requests for CPU to autoscale
+            # based on CPU utilization
+            #requests:
+              #cpu: "250m"
